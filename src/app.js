@@ -34,25 +34,54 @@ const app = express( )
     // res.send("Hello from test");
 // })
 
-app.use(
-    "/user",
-    (req, res, next) => {
-        console.log("handling the route User1");
-        // res.send("Response 1"); //still it would not go on second response & just hang on postman
-        next(); //to take it to second response
-    },
-    (req, res, next) => {
-        console.log("handling the route user 2!");
-        // res.send("2nd Response!!")
-        next()  // will go to 3re
-    },
-    (req, res) => {
-        console.log("handling the route user 3!");
-        res.send("3rd Response!!")
-    }
-)
+// PART - 2
+
+// app.use(
+//     "/user",
+//     (req, res, next) => {
+//         console.log("handling the route User1");
+//         // res.send("Response 1"); //still it would not go on second response & just hang on postman
+//         next(); //to take it to second response
+//     },
+//     (req, res, next) => {
+//         console.log("handling the route user 2!");
+//         // res.send("2nd Response!!")
+//         next()  // will go to 3re
+//     },
+//     (req, res) => {
+//         console.log("handling the route user 3!");
+//         res.send("3rd Response!!")
+//     }
+// )
  
 
+//  PART - 3
+// app.get("/user", (req, res, next) => {
+//     console.log("handling Route 1");
+//     next();
+// })
+// app.get("/user", (req, res) => {
+//     console.log("handling Route 2");
+//     res.send("Router 2")
+// })
+
+// Part - 4 (why to use middleware)
+//  Handle Auth Middleware for all Get, Post,...requests
+const { adminAuth, userAuth }= require('./middlewares/auth')
+app.use("/admin", adminAuth)
+// app.use("/user", userAuthAuth) // also can write it as 
+
+app.get('/user', userAuth, (req, res) => {
+    res.send("User Data Sent");
+})
+
+app.get("/admin/getAllData", (req, res) => {
+    res.send("All Data Send")
+}) 
+
+app.get("/admin/deleteUser", (req, res) => {
+    res.send("All Data deleted")
+})
 
 
 app.listen(7777, () => {
