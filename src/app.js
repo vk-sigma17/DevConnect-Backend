@@ -67,20 +67,49 @@ const app = express( )
 
 // Part - 4 (why to use middleware)
 //  Handle Auth Middleware for all Get, Post,...requests
-const { adminAuth, userAuth }= require('./middlewares/auth')
-app.use("/admin", adminAuth)
-// app.use("/user", userAuthAuth) // also can write it as 
 
-app.get('/user', userAuth, (req, res) => {
-    res.send("User Data Sent");
+// const { adminAuth, userAuth }= require('./middlewares/auth')
+// app.use("/admin", adminAuth)
+// // app.use("/user", userAuthAuth) // also can write it as 
+
+// app.get('/user', userAuth, (req, res) => {
+//     res.send("User Data Sent");
+// })
+
+// app.get("/admin/getAllData", (req, res) => {
+//     res.send("All Data Send")
+// }) 
+
+// app.get("/admin/deleteUser", (req, res) => {
+//     res.send("All Data deleted")
+// })
+
+
+//  Part - 5 (Error Handlig )
+// app.get("/user", (req, res) => {
+//     //Logic of DB Call & Get User Data
+//     throw new Error("DBSNNS");
+//     res.send("User Data Sent")
+// })
+
+//  when throw error will give this error
+app.use('/', (err, req, res, next) => {
+    if(err){
+        // Log Your error Message
+        res.status(500).send("Something Went Wrong!")
+    }
 })
+app.get("/user", (req, res) => {
+    
+    try{
+        //Logic of DB Call & Get User Data
 
-app.get("/admin/getAllData", (req, res) => {
-    res.send("All Data Send")
-}) 
-
-app.get("/admin/deleteUser", (req, res) => {
-    res.send("All Data deleted")
+        throw new Error("dbbshhss");
+        res.send("User Data Sent")
+    }catch(err){
+        res.status(500).send("some Error contact support team")
+    }
+   
 })
 
 
