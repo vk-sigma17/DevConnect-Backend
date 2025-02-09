@@ -1,5 +1,5 @@
-const express = require('express');
-const app = express( )
+// const express = require('express');
+// const app = express( )
 
 
 // it will give same response on any req (get, put, post) bcuz order matter
@@ -40,12 +40,12 @@ const app = express( )
 //     "/user",
 //     (req, res, next) => {
 //         console.log("handling the route User1");
-//         // res.send("Response 1"); //still it would not go on second response & just hang on postman
+//         res.send("Response 1"); //still it would not go on second response & just hang on postman
 //         next(); //to take it to second response
 //     },
 //     (req, res, next) => {
 //         console.log("handling the route user 2!");
-//         // res.send("2nd Response!!")
+//         res.send("2nd Response!!")
 //         next()  // will go to 3re
 //     },
 //     (req, res) => {
@@ -93,26 +93,73 @@ const app = express( )
 // })
 
 //  when throw error will give this error
-app.use('/', (err, req, res, next) => {
-    if(err){
-        // Log Your error Message
-        res.status(500).send("Something Went Wrong!")
-    }
-})
-app.get("/user", (req, res) => {
+// app.use('/', (err, req, res, next) => {
+//     if(err){
+//         // Log Your error Message
+//         res.status(500).send("Something Went Wrong!")
+//     }
+// })
+// app.get("/user", (req, res) => {
     
-    try{
-        //Logic of DB Call & Get User Data
+//     try{
+//         //Logic of DB Call & Get User Data
 
-        throw new Error("dbbshhss");
-        res.send("User Data Sent")
-    }catch(err){
-        res.status(500).send("some Error contact support team")
-    }
+//         throw new Error("dbbshhss");
+//         res.send("User Data Sent")
+//     }catch(err){
+//         res.status(500).send("some Error contact support team")
+//     }
    
+// })
+
+// connect node to database (mongoose)
+const express = require('express');
+const connectDB = require('./config/database')
+const User = require('./models/user')
+const app = express();
+
+app.post('/signup', async (req, res) => {
+    // const userObj = {
+
+    //     firstName: "Vikash",
+    //     lastName: "khowal",
+    //     emailId: "khowalvikash@gmail.com",
+    //     password: "khowal@123"
+    // }
+    // //creating a new instance of User Model
+    // const user = new User(userObj)
+
+    //OR
+    const user = new User({
+
+            firstName: "Virat",
+            lastName: "kohli",
+            emailId: "kohlivirat@gmail.com",
+            password: "virat@123"
+        }
+    )
+    try{
+        await user.save();
+        res.send("User Added Successfully!!")
+    } catch(err){
+        res.status(400).send("Error saving the user:", err.message)
+    }
+
 })
 
+connectDB()
+    .then(() => {
+        console.log("Database Connection Esta...");
+        app.listen(7777, () => {
+            console.log("server is successfully listening to port 7777..")
+        });
+    })
+    .catch((err) => {
+        console.error("Database cannot b e esta");
+    })
 
-app.listen(7777, () => {
-    console.log("server is listening successfully on port 7777...")
-})
+
+
+// app.listen(7777, () => {
+//     console.log("server is listening successfully on port 7777...")
+// })
