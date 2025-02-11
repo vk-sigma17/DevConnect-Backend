@@ -154,7 +154,34 @@ app.post('/signup', async (req, res) => {
 
 // })
 });
-connectDB()
+
+//get user by email
+app.get('/userTest', async(req, res) => {
+    const userEmail = req.body.emailId;
+    console.log(userEmail);
+    try{
+        // const users = await User.find({emailId: userEmail});
+        const users = await User.findOne({emailId: userEmail});
+       if(users.length === 0){
+        res.status(404).send("User Not Found!")
+       }else{
+
+           res.send(users);
+       }
+    }
+    catch(err){
+        res.status(400).send("Something Went Wrong")
+    }
+
+}) 
+
+//Feed API - Get/feed - get all the users from the database
+app.get('/feed', async(req, res) => {
+    const user2 = await User.find({})
+    res.send(user2);
+})
+
+connectDB() 
     .then(() => {
         console.log("Database Connection Esta...");
         app.listen(7777, () => {
