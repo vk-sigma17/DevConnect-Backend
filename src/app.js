@@ -181,6 +181,41 @@ app.get('/feed', async(req, res) => {
     res.send(user2);
 })
 
+//delete
+app.delete('/user', async (req, res) => {
+    const userId = req.body.userId;
+    try{
+        // const user = await User.findByIdAndDelete({ _id: userId});
+        //Shortend
+        const user = await User.findByIdAndDelete(userId);
+        res.send("user Deleted Successfully!")
+          
+    }
+    catch(err){
+        res.status(400).send("Something Went Wrong ")
+    }
+})
+// update data of user
+app.patch('/user', async (req, res) => {
+    const data = req.body;
+    const userId = req.body.userId;
+    try{
+        await User.findByIdAndUpdate({_id: userId}, data);
+    // to previous & next data after update
+        // const user = await User.findByIdAndUpdate({_id: userId}, data, {
+        //     returnDocument: "after",
+        // });
+        // const user = await User.findByIdAndUpdate({_id: userId}, data, {
+        //     returnDocument: "after",
+        // });
+        // console.log(user)
+        res.send('Data Updated Successfully');
+    }catch(err){
+        console.log("Someing Went Wrong!!")
+    }
+})
+
+
 connectDB() 
     .then(() => {
         console.log("Database Connection Esta...");
