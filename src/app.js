@@ -118,7 +118,11 @@ const connectDB = require('./config/database')
 const User = require('./models/user')
 const app = express();
 
+// middleware run on every request
+app.use(express.json()); //convert json into js object
+
 app.post('/signup', async (req, res) => {
+    // console.log(req.body);
     // const userObj = {
 
     //     firstName: "Vikash",
@@ -130,13 +134,16 @@ app.post('/signup', async (req, res) => {
     // const user = new User(userObj)
 
     //OR
-    const user = new User({
+    //Creating New instance of user Model
+    const user = new User(
+        // {
 
-            firstName: "Virat",
-            lastName: "kohli",
-            emailId: "kohlivirat@gmail.com",
-            password: "virat@123"
-        }
+        //     firstName: "Ms",
+        //     lastName: "Dhoni",
+        //     emailId: "DhoniMs@gmail.com",
+        //     password: "DhoniMs@123"
+        // }
+        req.body
     )
     try{
         await user.save();
@@ -145,8 +152,8 @@ app.post('/signup', async (req, res) => {
         res.status(400).send("Error saving the user:", err.message)
     }
 
-})
-
+// })
+});
 connectDB()
     .then(() => {
         console.log("Database Connection Esta...");
