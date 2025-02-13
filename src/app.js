@@ -142,14 +142,14 @@ app.post('/signup', async (req, res) => {
         //     lastName: "Dhoni",
         //     emailId: "DhoniMs@gmail.com",
         //     password: "DhoniMs@123"
-        // }
+         // }
         req.body
     )
     try{
         await user.save();
         res.send("User Added Successfully!!")
     } catch(err){
-        res.status(400).send("Error saving the user:", err.message)
+        res.status(400).send(`Error saving the user: ${err.message}`)
     }
 
 // })
@@ -200,7 +200,9 @@ app.patch('/user', async (req, res) => {
     const data = req.body;
     const userId = req.body.userId;
     try{
-        await User.findByIdAndUpdate({_id: userId}, data);
+        await User.findByIdAndUpdate({_id: userId}, data, {
+            runValidators: true, 
+        });
     // to previous & next data after update
         // const user = await User.findByIdAndUpdate({_id: userId}, data, {
         //     returnDocument: "after",
@@ -211,10 +213,10 @@ app.patch('/user', async (req, res) => {
         // console.log(user)
         res.send('Data Updated Successfully');
     }catch(err){
-        console.log("Someing Went Wrong!!")
+        res.status(400).send(`Update Failed : ${err.message}`)
     }
 })
-
+ 
 
 connectDB() 
     .then(() => {
