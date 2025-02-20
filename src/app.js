@@ -117,43 +117,82 @@ const express = require('express');
 const connectDB = require('./config/database')
 const User = require('./models/user')
 const app = express();
-
+const { validateSignUpData } = require('./utils/validation')
+const bcrypt = require('bcrypt');
+ 
 // middleware run on every request
 app.use(express.json()); //convert json into js object
 
 app.post('/signup', async (req, res) => {
-    // console.log(req.body);
-    // const userObj = {
-
-    //     firstName: "Vikash",
-    //     lastName: "khowal",
-    //     emailId: "khowalvikash@gmail.com",
-    //     password: "khowal@123"
-    // }
-    // //creating a new instance of User Model
-    // const user = new User(userObj)
-
-    //OR
-    //Creating New instance of user Model
-    const user = new User(
-        // {
-
-        //     firstName: "Ms",
-        //     lastName: "Dhoni",
-        //     emailId: "DhoniMs@gmail.com",
-        //     password: "DhoniMs@123"
-         // }
-        req.body
-    )
     try{
+        // Validation of data
+        validateSignUpData(req);
+        
+        const { firstName, lastName, emailId, password} = req.body;
+        
+        // Encrypt the password
+        const passwordHash = await bcrypt.hash(password, 10);
+    
+        // console.log(req.body);
+        // const userObj = {
+    
+        //     firstName: "Vikash",
+        //     lastName: "khowal",
+        //     emailId: "khowalvikash@gmail.com",
+        //     password: "khowal@123"
+        // }
+        // //creating a new instance of User Model
+        // const user = new User(userObj)
+    
+        //OR
+        //Creating New instance of user Model
+        const user = new User(
+            // first Method
+            // {
+    
+            //     firstName: "Ms",
+            //     lastName: "Dhoni",
+            //     emailId: "DhoniMs@gmail.com",
+            //     password: "DhoniMs@123"
+             // }
+
+            //  2nd Method 
+            // req.body
+
+            //Good way to explain each part
+            { firstName, lastName, emailId, password: passwordHash}
+        )
         await user.save();
         res.send("User Added Successfully!!")
     } catch(err){
-        res.status(400).send(`Error saving the user: ${err.message}`)
+        res.status(400).send(`ERROR: ${err.message}`)
     }
 
 // })
 });
+
+// login Api
+app.post('/login', async(req, res) => {
+    try{
+        const { emailId, password } = req.body;
+
+        const user = await User.findOne({emailId: emailId});
+        if(!user){
+            throw new Error("Invalid Credentials")
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if(isPasswordValid){
+            res.send("User Login Successfully");
+        }else{
+            throw new Error("Invalid Credentials")
+        }
+
+    }
+    catch(err){
+        res.status(400).send(`ERROR: ${err.message}`)
+    }
+})
 
 //get user by email
 app.get('/userTest', async(req, res) => {

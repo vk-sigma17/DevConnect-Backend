@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+var validator = require('validator');
+
 
 const userSchema = mongoose.Schema(
     {
@@ -16,11 +18,21 @@ const userSchema = mongoose.Schema(
         required: true,
         unique: true,
         lowercase: true,
-        trim: true 
+        trim: true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("Invalid Email Address :" + value)
+            }
+        }   
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("Enter A Strong Password!")
+            }
+        } 
     },
     age: {
         type: Number,
@@ -38,7 +50,12 @@ const userSchema = mongoose.Schema(
     },
     photoUrl: {
         type: String,
-        default: "https://www.mjunction.in/wp-content/uploads/2020/09/Dummy.jpg"
+        default: "https://www.mjunction.in/wp-content/uploads/2020/09/Dummy.jpg",
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid URL Address :" + value)
+            }
+        } 
     },
     about: {
         type: String,
