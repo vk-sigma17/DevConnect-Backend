@@ -115,136 +115,22 @@
 // connect node to database (mongoose)
 const express = require('express');
 const connectDB = require('./config/database')
-const User = require('./models/user')
 const app = express();
-const { validateSignUpData } = require('./utils/validation')
-const bcrypt = require('bcrypt');
-
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-const { userAuth } = require('./middlewares/auth')
+
  
-// middlewa re run on every request
+// middleware run on every request
 app.use(express.json()); //convert json into js object
 app.use(cookieParser())  // use to get token to send with other api
 
-app.post('/signup', async (req, res) => {
-    try{
-        // Validation of data
-        validateSignUpData(req);
-        
-        const { firstName, lastName, emailId, password} = req.body;
-        
-        // Encrypt the password
-        const passwordHash = await bcrypt.hash(password, 10);
-    
-        // console.log(req.body);
-        // const userObj = {
-    
-        //     firstName: "Vikash",
-        //     lastName: "khowal",
-        //     emailId: "khowalvikash@gmail.com",
-        //     password: "khowal@123"
-        // }
-        // //creating a new instance of User Model
-        // const user = new User(userObj)
-    
-        //OR
-        //Creating New instance of user Model
-        const user = new User(
-            // first Method
-            // {
-    
-            //     firstName: "Ms",
-            //     lastName: "Dhoni",
-            //     emailId: "DhoniMs@gmail.com",
-            //     password: "DhoniMs@123"
-             // }
+const authRouter = require('./routes/auth')
+const profileRouter = require('./routes/profile')
+const requestRouter = require('./routes/request')
 
-            //  2nd Method 
-            // req.body
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter);
 
-            //Good way to explain each part
-            { firstName, lastName, emailId, password: passwordHash}
-        )
-        await user.save();
-        res.send("User Added Successfully!!")
-    } catch(err){
-        res.status(400).send(`ERROR: ${err.message}`)
-    }
-
-// })
-});
-
-// login Api
-app.post('/login', async(req, res) => {
-    try{
-        const { emailId, password } = req.body;
-
-        const user = await User.findOne({emailId: emailId});
-        if(!user){
-            throw new Error("Invalid Credentials")
-        }
-
-        const isPasswordValid = await user.validatePassword(password);
-        if(isPasswordValid){ 
-
-            const token = await user.getJWT();
-            console.log(token);
-            // add token to cookie and send the response back to user
-            res.cookie("token", token, {
-                 expires: new Date(Date.now() + 8 * 3600000)
-            });
-            res.send("User Login Successfully");
-        }else{
-            throw new Error("Invalid Credentials")
-        }
-
-    }
-    catch(err){
-        res.status(400).send(`ERROR: ${err.message}`)
-    }
-}) 
-
-// acess profile
-app.get('/profile', userAuth, async(req, res) => {
-    try{
-
-        // const cookie = req.cookies;
-    
-        // const {token} = cookie;
-        // if(!token){
-        //     throw new Error("Invalid Token")
-        // }
-
-        // // validate my token
-        // const decodedMsg = await jwt.verify(token, "Dev@Tinder&789")
-    
-        // console.log(decodedMsg)
-        // const { _id} = decodedMsg;
-        // console.log("Logged in user is: " + _id)
-    
-        // const user = await User.findById(_id)
-        // if(!user){
-        //     throw new Error("User Does Not Exist"); 
-        // }
-    
-        // console.log(cookie);
-
-        // No Need For Upper Code 
-        const user = req.user;
-        res.send(user)
-    }
-    catch(err){
-        res.status(400).send(`E RROR: ${err.message}`)
-    }
-})
- 
-app.post('/sendConnectionReq', userAuth, (req, res) => {
-    const user = req.user;
-    // console.log("Send Connection Request!");
-    res.send(user.firstName + "  Send Connection Request!");
-})
 
 connectDB() 
     .then(() => {
