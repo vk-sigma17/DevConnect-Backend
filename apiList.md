@@ -8,7 +8,7 @@
 ##ProfileRouter
 -GET /profile/view
 -PATCH /profile/edit
--PATCH /profile/password
+-PATCH /profile/password //Forgot Password API
 
 ##connectionRequestRouter
 -POST /request/send/interested/:userId
