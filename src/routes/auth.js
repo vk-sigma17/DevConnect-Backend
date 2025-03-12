@@ -1,7 +1,7 @@
 const express = require('express');
 const authRouter = express.Router();
 
-const { validateSignUpData } = require('../utils/validation');
+const { validateSignUpData, validateLoginData } = require('../utils/validation');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
@@ -59,9 +59,9 @@ authRouter.post('/signup', async (req, res) => {
 
 // login Api
 authRouter.post('/login', async(req, res) => {
+    const { emailId, password } = req.body;
     try{
-        const { emailId, password } = req.body;
-
+        validateLoginData(req)
         const user = await User.findOne({emailId: emailId});
         if(!user){
             throw new Error("Invalid Credentials")

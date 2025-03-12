@@ -2,7 +2,8 @@ const express = require('express');
 const profileRouter = express.Router();
 const { userAuth } = require('../middlewares/auth');
 // const { validateSignUpData } = require('../utils/validation');
-const {validateEditProfileData} = require('../utils/validation')
+const {validateEditProfileData, validatePasswordData} = require('../utils/validation')
+const bcrypt = require('bcrypt');
 
 // acess profile
 profileRouter.get('/profile/view', userAuth, async(req, res) => {
@@ -34,9 +35,11 @@ profileRouter.get('/profile/view', userAuth, async(req, res) => {
         res.send(user)
     }
     catch(err){
-        res.status(400).send(`E RROR: ${err.message}`)
+        res.status(400).send(`ERROR: ${err.message}`)
     }
 })
+
+//edit profile
 
 profileRouter.patch('/profile/edit', userAuth, async(req, res) => {
     try{
@@ -57,5 +60,26 @@ profileRouter.patch('/profile/edit', userAuth, async(req, res) => {
         res.status(400).send("ERROR :" + err.message);
     }
 })
+
+// update password
+
+profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+	try {
+		const { password, newPassword } = req.body;
+		const user = req.user;
+		const isValidPassword = await user.validatePassword(password);
+		if (!isValidPassword) {
+			throw new Error("Invalid credentials");
+		}
+		validatePasswordData(req);
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		user.password = hashedPassword;
+		await user.save();
+		res.json({ message: "Password Updated successfully!" });
+	} catch (err) {
+		res.status(500).send("ERROR : " + err.message);
+	}
+});
+
 
 module.exports = profileRouter; 
