@@ -47,9 +47,16 @@ authRouter.post('/signup', async (req, res) => {
 
             //Good way to explain each part
             { firstName, lastName, emailId, password: passwordHash}
-        )
-        await user.save();
-        res.send("User Added Successfully!!")
+        );
+        // make user login directly after signUp
+        const savedUser = await user.save();
+        const token = await user.getJWT();
+        res.cookie("token", token, {
+             expires: new Date(Date.now() + 8 * 3600000)
+        });
+        res.json({message: "User Added Successfully!!",
+            data: savedUser
+        })
     } catch(err){
         res.status(400).send(`ERROR: ${err.message}`)
     }
@@ -76,7 +83,8 @@ authRouter.post('/login', async(req, res) => {
             res.cookie("token", token, {
                  expires: new Date(Date.now() + 8 * 3600000)
             });
-            res.send("User Login Successfully");
+            // res.send("User Login Successfully");
+            res.send(user);
         }else{
             throw new Error("Invalid Credentials")
         }

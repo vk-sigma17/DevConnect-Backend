@@ -57,12 +57,14 @@ const userSchema = mongoose.Schema(
     photoUrl: {
         type: String,
         default: "https://www.mjunction.in/wp-content/uploads/2020/09/Dummy.jpg",
-        validate(value){
-            if(!validator.isURL(value)){
-                throw new Error("Invalid URL Address :" + value)
+        validate(value) {
+            // Only validate if the value is not empty
+            if (value && !validator.isURL(value)) {
+                throw new Error("Invalid URL Address: " + value);
             }
-        } 
+        }
     },
+    
     about: {
         type: String,
         default: "this is a default about the user !!"

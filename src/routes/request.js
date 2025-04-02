@@ -83,8 +83,9 @@ requestRouter.post('/request/review/:status/:requestId', userAuth, async(req, re
                 success: false
             })
         }
-    
+        connctionReq.status = status;
         const data = await connctionReq.save();
+
         return res.status(200).json({
             message: "connection Request " + status + " By " + loggedInUser.firstName,
             data,
