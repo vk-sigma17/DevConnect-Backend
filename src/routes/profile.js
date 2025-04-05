@@ -17,7 +17,7 @@ profileRouter.get('/profile/view', userAuth, async(req, res) => {
         // }
 
         // // validate my token
-        // const decodedMsg = await jwt.verify(token, "Dev@Tinder&789")
+        // const decodedMsg = await jwt.verify(token, process.env.JWT_SECRET_KEY)
     
         // console.log(decodedMsg)
         // const { _id} = decodedMsg;

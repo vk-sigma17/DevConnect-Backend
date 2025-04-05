@@ -114,12 +114,13 @@
 
 // connect node to database (mongoose)
 const express = require('express');
-const connectDB = require('./config/database')
 const app = express();
+const connectDB = require('./config/database')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+require('dotenv').config(); 
 
- 
+
 // middleware run on every request
 app.use(express.json()); //convert json into js object
 app.use(cookieParser())  // use to get token to send with other api
@@ -142,7 +143,7 @@ app.use("/", userRouter)
 connectDB() 
     .then(() => {
         console.log("Database Connection Esta...");
-        app.listen(7777, () => {
+        app.listen( process.env.PORT, () => {
             console.log("server is successfully listening to port 7777..")
         });
     })
