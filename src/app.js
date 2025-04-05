@@ -118,7 +118,8 @@ const app = express();
 const connectDB = require('./config/database')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-require('dotenv').config(); 
+const dotenv = require('dotenv')
+dotenv.config()
 
 
 // middleware run on every request
