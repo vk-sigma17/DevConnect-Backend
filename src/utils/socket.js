@@ -1,5 +1,6 @@
 const socket = require("socket.io");
-const crypto = require('crypto')
+const crypto = require('crypto');
+const { Chat } = require("../models/chats");
 
 const getSecretRoomId = (userId, targetedId) => {
     return crypto.createHash("sha256")
@@ -22,10 +23,33 @@ const initaializeSocket = (server) => {
             socket.join(RoomId);
         })
 
-        socket.on("sendMessages", ({userId, targetedId, firstName, text}) => {
-            const RoomId = getSecretRoomId(userId, targetedId);
-            // console.log(firstName + " " + text)
-            io.to(RoomId).emit("MessageReceived", {firstName, text})
+        socket.on("sendMessages", async({userId, targetedId, firstName, lastName, text}) => {
+            
+            try{
+                const RoomId = getSecretRoomId(userId, targetedId);
+                // Save the messages in DB
+                let chat =  await Chat.findOne({
+                    participants: {$all:[userId, targetedId]},
+                })
+                // create a New Chat
+                if(!chat){
+                    chat = new Chat({
+                        participants: [userId, targetedId],
+                        messages: []
+                    })
+                }
+                // if already exist push this new msg to it
+                chat.messages.push({
+                    senderId: userId,
+                     text,
+                    });
+                 await chat.save();
+                io.to(RoomId).emit("MessageReceived", {firstName, lastName, text})
+                
+            }
+            catch(err){
+                console.log(err)
+            }
 
         })
 
